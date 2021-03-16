@@ -6,13 +6,34 @@ using System.Threading.Tasks;
 
 namespace GraphicsLibrary
 {
+    /// <summary>
+    /// Холст - изображение в памяти
+    /// </summary>
     public class Canvas
     {
+	/// <summary>
+	/// Ширина изображения (строки)
+	/// </summary>
         public int width;
+	/// <summary>
+	/// Высота изображения (число строк)
+	/// </summary>
         public int height;
+	/// <summary>
+	/// Число бит на пиксель
+	/// </summary>
         public int bpp;
+	/// <summary>
+	/// Данные изображения (Пиксели хранятся построчно)
+	/// </summary>
         public int[] data;
 
+	/// <summary>
+	/// Создает новый холст
+	/// </summary>
+        /// <param name="width">ширина</param>
+        /// <param name="height">высота</param>
+        /// <param name="bpp">бит на пиксель</param>
         public Canvas(int width, int height, int bpp)
         {
             this.width = width;
@@ -21,6 +42,12 @@ namespace GraphicsLibrary
             data = new int[width * height];
         }
 
+	/// <summary>
+	/// Рисует точку на холсте, отсекает (не рисует) точки не попадающие на холст
+	/// </summary>
+        /// <param name="x">координата x</param>
+        /// <param name="y">координата y</param>
+        /// <param name="color">цвет точки</param>
         public void DrawPixel(int x, int y, int color)
         {
             if (0 <= x && x < width)
@@ -28,6 +55,12 @@ namespace GraphicsLibrary
                     data[x + y * width] = color;
         }
 
+	/// <summary>
+	/// Рисует другой холст на холсте (поверх)
+	/// </summary>
+        /// <param name="a_x">координата x</param>
+        /// <param name="a_y">координата y</param>
+        /// <param name="a_canvas">холст, который будет нарисован</param>
 	public void DrawCanvas(int a_x, int a_y, Canvas a_canvas)
         {
             if (a_canvas is null)
@@ -40,59 +73,103 @@ namespace GraphicsLibrary
                     DrawPixel(x, y, a_canvas.pixels[x - a_x + ((y - a_y) * a_canvas.width)]);
 	}
 
+	/// <summary>
+	/// Рисует линию на холсте
+	/// </summary>
+        /// <param name="x1">координата x начальной точки</param>
+        /// <param name="y1">координата y начальной точки</param>
+        /// <param name="x2">координата x конечной точки</param>
+        /// <param name="y2">координата y конечной точки</param>
+        /// <param name="color">цвет линии</param>
         public void DrawLine(int x1, int y1, int x2, int y2, int color)
         {
-            float error = 0;
-            float deltaerr = 0;
-            int dir = 0;
-            int st = 0;
-            int end = 0;
-            int c2 = 0;
-            int deltax = Math.Abs(x2 - x1);
-            int deltay = Math.Abs(y2 - y1);
-            if (deltax > deltay)
+	    int deltax = x2 - x1;
+            int deltay = y2 - y1;
+            int dir = deltay > 0 ? 1 : -1;
+            int y = y1 - dir;
+            int x = x1;
+            if (deltax == 0) // вертикальная линия
             {
-                deltaerr = (float)(deltay + 1) / (float)(deltax + 1);
-                dir = y2 - y1;
-                st = (x1 > x2) ? x2 : x1;
-                end = (x1 > x2) ? x1 : x2;
-                c2 = (y1 > y2) ? y2 : y1;
+                while (true)
+                {
+                    y += dir;
+                    DrawPixel(x1, y, color);
+                    if (y == y2) break;
+                }
+
+            }
+            else if (deltay == 0) // горизонтальная линия
+            {
+                dir = deltax > 0 ? 1 : -1;
+                x -= dir;
+                while (true)
+                {
+                    x += dir;
+                    DrawPixel(x, y1, color);
+                    if (x == x2) break;
+                }
             }
             else
             {
-                deltaerr = (float)(deltax + 1) / (float)(deltay + 1);
-                dir = x2 - x1;
-                st = (y1 > y2) ? y2 : y1;
-                end = (y1 > y2) ? y1 : y2;
-                c2 = (x1 > x2) ? x2 : x1;
-            }
-            dir = (dir > 0) ? dir = 1 : dir = -1;
-            for (int c1 = st; c1 < end; c1++)
-            {
-                if (deltax > deltay) DrawPixel(c1, c2, color);
-                else DrawPixel(c2, c1, color);
-                error += deltaerr;
-                if (error >= 1)
+                float k = Convert.ToSingle(deltay) / deltax;
+                float xx = x1;
+                float yy = y1;
+                if (Math.Abs(k) <= 1.0f) // линия, протяженная по x
+                    for (x = 0; x <= Math.Abs(deltax); x++)
+                    {
+                        DrawPixel(Convert.ToInt32(xx), Convert.ToInt32(yy), color);
+                        xx += dir;
+                        yy += k * dir;
+                    }
+                else  // линия, протяженная по y
                 {
-                    c2 += dir;
-                    error -= 1;
+                    dir = deltax > 0 ? 1 : -1;
+                    for (y = 0; y <= Math.Abs(deltay); y++)
+                    {
+                        DrawPixel(Convert.ToInt32(xx), Convert.ToInt32(yy), color);
+                        yy += dir;
+                        xx += (1.0f / k) * dir;
+                    }
                 }
             }
         }
 
+	/// <summary>
+	/// Рисует прямоугольник на холсте
+	/// </summary>
+        /// <param name="x1">координата x левого верхего угла</param>
+        /// <param name="y1">координата y левого верхего угла</param>
+        /// <param name="x2">координата x правого нижнего угла</param>
+        /// <param name="y2">координата y правого нижнего угла</param>
+        /// <param name="color">цвет границы</param>
 	public void Rectangle(int x1, int y1, int x2, int y2, int color)
         {
             for (int x = x1; x <= x2; x++)
             {
-                Point(x, y1, color);
-                Point(x, y2, color);
+                DrawPixel(x, y1, color);
+                DrawPixel(x, y2, color);
             }
             for (int y = y1; y <= y2; y++)
             {
-                Point(x1, y, color);
-                Point(x2, y, color);
+                DrawPixel(x1, y, color);
+                DrawPixel(x2, y, color);
             }
         }
+
+	/// <summary>
+	/// Рисует заполненный прямоугольник на холсте
+	/// </summary>
+        /// <param name="x1">координата x левого верхего угла</param>
+        /// <param name="y1">координата y левого верхего угла</param>
+        /// <param name="x2">координата x правого нижнего угла</param>
+        /// <param name="y2">координата y правого нижнего угла</param>
+        /// <param name="color">цвет заполнения</param>
+	public void FillRectangle(int x1, int y1, int x2, int y2, int color)
+        {
+            for (int x = x1; x <= x2; x++)
+                for (int y = y1; y <= y2; y++)
+                    DrawPixel(x, y, color);
+        }	
     }
 }
 
