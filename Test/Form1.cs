@@ -19,33 +19,47 @@ namespace rectangle
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-	    Canvas c = new Canvas(Width, Height, 8);
-            c.Rectangle(10, 10, 50, 50, Color.DarkMagenta.ToArgb());
-            c.Rectangle(0, 0, 550, 550, Color.ForestGreen.ToArgb());
-            c.Rectangle(-10, -10, 250, 250, Color.Gold.ToArgb());
-            c.FillRectangle(0, 0, Width,Height, Color.Gold.ToArgb());
-            /*c.DrawLine(300, 300, 300, 500, Color.Red.ToArgb());
-            c.DrawLine(300, 300, 300, 100, Color.Blue.ToArgb());
-            c.DrawLine(300, 300, 100, 300, Color.Blue.ToArgb());
-            c.DrawLine(300, 300, 400, 400, Color.Blue.ToArgb());
-            c.DrawLine(300, 300, 200, 200, Color.Blue.ToArgb());*/
-            int centerX = Width / 2;
-            int centerY = Height / 2;
-            int radius = 200;
-            float angle = 0;
-            float step = 1.0f;
-            while (angle < 360.0f)
+	    Screen s = new Screen(Width, Height, 8);
+            Canvas c = new Canvas(Width, Height, 8); ;
+            s.SetWindow(-1.5, 1.5, -1.5, 1.5);
+            //s.FillRectangle(0, 0, Width, Height, Color.Gold.ToArgb());
+            //s.DrawLine(0, 0, Width, Height, Color.Black.ToArgb());
+            double centerX = 0 / 2;
+            double centerY = 0 / 2;
+            double radius = 1;
+            double angle = 0;
+            double step = 1.0;
+            Model m = new Model(Color.Red.ToArgb());
+
+            while (angle < 360.0)
             {
-                c.DrawLine(centerX, centerY, Convert.ToInt32(centerX + radius * Math.Cos(angle * Math.PI / 180)), 
-                    Convert.ToInt32(centerY + radius * Math.Sin(angle * Math.PI / 180)), Color.Black.ToArgb());
+                m.AddVertex(Convert.ToSingle(centerX + radius * Math.Cos(angle * Math.PI / 180)), Convert.ToSingle(centerY + radius * Math.Sin(angle * Math.PI / 180)));
+                
+                    s.DrawLine(centerX, centerY, Convert.ToSingle(centerX + radius * Math.Cos(angle * Math.PI / 180)),
+                    Convert.ToSingle(centerY + radius * Math.Sin(angle * Math.PI / 180)), Color.Black.ToArgb());
+                angle += step;
+            }
+            s.DrawModel(m);
+            m.Translate(0.2, 0.1);
+            s.DrawModel(m);
+            s.DrawLine(0.0, 0.0, 1.5, 1.5, Color.Blue.ToArgb());
+            m.Scale(0.5, 0.3);
+            s.DrawModel(m);
+            angle = 0;
+            while (angle < 360.0)
+            {
+                m.Rotate(angle * Math.PI / 180);
+                s.DrawModel(m);
                 angle += step;
             }
 
-            Bitmap image = new Bitmap(c.width, c.height);
-            for (int y = 0; y < c.height; y++)
-                for (int x = 0; x < c.width; x++)
+            //c.DrawLine(0, 600, 100, 100, Color.Black.ToArgb());
+//            c.DrawLine(0, 0, 400, 300, Color.Black.ToArgb());
+            Bitmap image = new Bitmap(s.width, s.height);
+            for (int y = 0; y < s.height; y++)
+                for (int x = 0; x < s.width; x++)
                 {
-                    int h = c.data[x + y * c.width];
+                    int h = s.data[x + y * s.width];
                     image.SetPixel(x, y, Color.FromArgb(h));
                 }
             e.Graphics.DrawImage(image, 0, 0);
