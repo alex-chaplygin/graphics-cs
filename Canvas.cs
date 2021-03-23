@@ -70,7 +70,7 @@ namespace GraphicsLibrary
 
             for (int x = a_x; x < a_x + a_canvas.width; x++)
                 for (int y = a_y; y < a_y + a_canvas.height; y++)
-                    DrawPixel(x, y, a_canvas.pixels[x - a_x + ((y - a_y) * a_canvas.width)]);
+                    DrawPixel(x, y, a_canvas.data[x - a_x + ((y - a_y) * a_canvas.width)]);
 	}
 
 	/// <summary>
