@@ -91,5 +91,31 @@ namespace GraphicsLibrary
                 v.vect[0] * matrix[0, 0] + v.vect[1] * matrix[0, 1] + matrix[0, 2],
                 v.vect[0] * matrix[1, 0] + v.vect[1] * matrix[1, 1] + matrix[1, 2]);
         }
+	/// <summary>
+	///   Умножение текущей матрицы на матрицу
+	/// </summary>
+        /// <param name="m">матрица на которую умножается текущая матрица</param>
+	public void Mult(Matrix3 m)
+        {
+            double[,] tempM = new double[3,3];
+            tempM[0, 0] = matrix[0, 0] * m.matrix[0, 0] + matrix[0, 1] * m.matrix[1, 0] + matrix[0, 2] * m.matrix[2, 0];
+            tempM[0, 1] = matrix[0, 0] * m.matrix[0, 1] + matrix[0, 1] * m.matrix[1, 1] + matrix[0, 2] * m.matrix[2, 1];
+            tempM[0, 2] = matrix[0, 0] * m.matrix[0, 2] + matrix[0, 1] * m.matrix[1, 2] + matrix[0, 2] * m.matrix[2, 2];
+            tempM[1, 0] = matrix[1, 0] * m.matrix[0, 0] + matrix[1, 1] * m.matrix[1, 0] + matrix[1, 2] * m.matrix[2, 0];
+            tempM[1, 1] = matrix[1, 0] * m.matrix[0, 1] + matrix[1, 1] * m.matrix[1, 1] + matrix[1, 2] * m.matrix[2, 1];
+            tempM[1, 2] = matrix[1, 0] * m.matrix[0, 2] + matrix[1, 1] * m.matrix[1, 2] + matrix[1, 2] * m.matrix[2, 2];
+            tempM[2, 0] = matrix[2, 0] * m.matrix[0, 0] + matrix[2, 1] * m.matrix[1, 0] + matrix[2, 2] * m.matrix[2, 0];
+            tempM[2, 1] = matrix[2, 0] * m.matrix[0, 1] + matrix[2, 1] * m.matrix[1, 1] + matrix[2, 2] * m.matrix[2, 1];
+            tempM[2, 2] = matrix[2, 0] * m.matrix[0, 2] + matrix[2, 1] * m.matrix[1, 2] + matrix[2, 2] * m.matrix[2, 2];
+            matrix[0, 0] = tempM[0, 0];
+            matrix[0, 1] = tempM[0, 1];
+            matrix[0, 2] = tempM[0, 2];
+            matrix[1, 0] = tempM[1, 0];
+            matrix[1, 1] = tempM[1, 1];
+            matrix[1, 2] = tempM[1, 2];
+            matrix[2, 0] = tempM[2, 0];
+            matrix[2, 1] = tempM[2, 1];
+            matrix[2, 2] = tempM[2, 2];
+        }
     }
 }
